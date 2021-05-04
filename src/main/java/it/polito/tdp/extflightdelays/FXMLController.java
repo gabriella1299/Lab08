@@ -35,7 +35,18 @@ public class FXMLController {
 
     @FXML
     void doAnalizzaAeroporti(ActionEvent event) {
-    	//TODO
+    	txtResult.clear();
+    	try {
+    		String s=distanzaMinima.getText();
+    		int x=Integer.parseInt(s);
+    		this.model.creaGrafo(x);
+    		
+    	}catch(NumberFormatException nfe) {
+    		nfe.printStackTrace();
+    	}
+    	
+    	txtResult.appendText(this.model.stampaGrafo());
+    	txtResult.appendText(this.model.stampaArchi());
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
