@@ -14,25 +14,41 @@ public class Model {
 	
 	Graph<Airport,DefaultWeightedEdge> grafo;
 	
-	ExtFlightDelaysDAO dao=new ExtFlightDelaysDAO();
-	List<Airport> airport;
+	ExtFlightDelaysDAO dao;
+	List<Airport> airport; //potevo anche fare un'idMap
+						   //cambio metodo loadAllAirports()
 
+	public Model() {
+		dao=new ExtFlightDelaysDAO();
+		airport= dao.loadAllAirports();
+	}
 	public void creaGrafo(int x) {
 		
+		//grafo deve essere semplice, non orientato e pesato
+		//i vertici devono rappresentare gli aeroporti
+		//mentre gli archi devono indicare le rotte tra gli aeroporti collegati tra di loro da almeno un volo
+		//peso dell’arco rappresenta la “distanza media percorsa” tra i due aeroporti
+		
 		this.grafo=new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
-		airport= dao.loadAllAirports();
+		
+		//Aggiunta vertici
 		Graphs.addAllVertices(this.grafo, airport);
 		
+		//Aggiunta archi
+		//L’arco tra due aeroporti deve essere aggiunto solo se 
+		//la distanza media percorsa è superiore a x
 		for(Distance d: dao.getAvgDistance(x)) {
+			
 			Airport a1=getAirport(d.getA1_id());
 			Airport a2=getAirport(d.getA2_id());
+			
 			if(!this.grafo.containsEdge(a1, a2))
 				Graphs.addEdge(this.grafo, a1, a2, d.getMedia());
-			else {
+			else { //l'arco esiste gia' quinid aggiorno solo il peso
 				DefaultWeightedEdge e=this.grafo.getEdge(a1, a2);
-				double peso=this.grafo.getEdgeWeight(e);
-				peso=(peso+d.getMedia())/2;
-				this.grafo.setEdgeWeight(a1, a2, peso);
+				double pesoVecchio=this.grafo.getEdgeWeight(e);
+				double pesoNuovo=(pesoVecchio+d.getMedia())/2;
+				this.grafo.setEdgeWeight(a1, a2, pesoNuovo);
 			}
 		}
 		
@@ -40,16 +56,12 @@ public class Model {
 	}
 	
 	public String stampaGrafo() {
-		return "Grafo creato con "+grafo.vertexSet().size()+" vertici e "+grafo.edgeSet().size()+" archi "+"\n";
+		return "Grafo creato con "+grafo.vertexSet().size()+" vertici e "+grafo.edgeSet().size()+" archi "+"\n\nELENCO ROTTE:\n";
 	}
-	
-	public List<Distance> getAvgDistance(int x) {
-		return dao.getAvgDistance(x);
-	}
-	
+		
 	public Airport getAirport(int id) {
 		
-		for(Airport a: dao.loadAllAirports()) {
+		for(Airport a: airport) {
 			if(a.getId()==id)
 				return a;
 		}
@@ -66,6 +78,9 @@ public class Model {
 		return stampa;
 	}
 	
+	public int getArchi(){
+		return this.grafo.edgeSet().size();
+	}
 }
 
 

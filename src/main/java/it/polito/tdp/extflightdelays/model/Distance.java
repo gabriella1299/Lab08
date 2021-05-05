@@ -4,6 +4,7 @@ public class Distance {
 	private int a1_id;
 	private int a2_id;
 	private double media;
+	
 	public Distance(int a1_id, int a2_id, double media) {
 		super();
 		this.a1_id = a1_id;

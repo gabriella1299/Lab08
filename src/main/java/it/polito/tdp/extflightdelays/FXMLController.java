@@ -41,12 +41,21 @@ public class FXMLController {
     		int x=Integer.parseInt(s);
     		this.model.creaGrafo(x);
     		
+    		txtResult.appendText(this.model.stampaGrafo());
+    		
+    		if(this.model.getArchi()==0) {
+    			txtResult.appendText("Nessuna rotta trovata.");
+    			return;
+    		}
+        	txtResult.appendText(this.model.stampaArchi());
+    		
     	}catch(NumberFormatException nfe) {
-    		nfe.printStackTrace();
+    		txtResult.setText("Inserire valori numerici!");
+    	}catch(NullPointerException npe) {
+    		txtResult.setText("Inserire valori numerici!");
     	}
     	
-    	txtResult.appendText(this.model.stampaGrafo());
-    	txtResult.appendText(this.model.stampaArchi());
+    	distanzaMinima.clear();
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
